@@ -42,12 +42,13 @@ class Genome {
 			}
 		}
 	}
-
+	// setter
 	void set_word(const string& new_word) {
 		word = new_word;
 		update_fitness();
 	}
 
+	// getter
 	int get_fitness() const { return fitness; }
 	string get_word() const { return word; }
 };
