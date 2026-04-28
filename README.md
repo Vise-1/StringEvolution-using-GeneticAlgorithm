@@ -1,4 +1,4 @@
-<img width="900" height="681" alt="image" src="https://github.com/user-attachments/assets/cb03a328-0994-4a24-a38e-a30a07759592" />String Evolution! 
+String Evolution! 
 using Genetic Algorithms!
 
 The program takes a string from user and evolves random gibberish into the string using genetic selection try it out yourself ! download the zip and run the exe directly nothing else!
@@ -6,7 +6,7 @@ The program takes a string from user and evolves random gibberish into the strin
 okay so lets break it down : 
 we have a few major checkpoints to build for our genetic algorithm
 
-<img width="900" height="681" alt="image" src="https://github.com/user-attachments/assets/2035fe31-d76e-471a-b17f-671af4d58c1e" />
+<img width="700" height="530" alt="image" src="https://github.com/user-attachments/assets/2035fe31-d76e-471a-b17f-671af4d58c1e" />
 (Image from Generative Design Primer Website)
 
 
