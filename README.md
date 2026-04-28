@@ -3,6 +3,9 @@ using Genetic Algorithms!
 
 The program takes a string from user and evolves random gibberish into the string using genetic selection try it out yourself ! download the zip and run the exe directly nothing else!
 
+<img width="607" height="455" alt="image" src="https://github.com/user-attachments/assets/a654b2b8-28d3-41b2-8a36-463f41249f7d" />
+
+
 okay so lets break it down : 
 we have a few major checkpoints to build for our genetic algorithm
 
