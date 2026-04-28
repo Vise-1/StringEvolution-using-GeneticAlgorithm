@@ -18,57 +18,74 @@ mt19937 gen(rd());
 string target = "Trippi";
 string current = "";
 
+class Genome {
+	private:
+		string word;
+		int fitness;
+
+	public: 
+
+	Genome() {
+		word = "";
+		fitness = 0;
+	}
+
+	Genome(string s) : word(s), fitness(0) {
+		update_fitness();
+	}
+		
+	void update_fitness() {
+		fitness = 0;
+		for (int i = 0; i < word.size(); i++) {
+			if (word[i] == target[i]) {
+				fitness++;
+			}
+		}
+	}
+
+	void set_word(const string& new_word) {
+		word = new_word;
+		update_fitness();
+	}
+
+	int get_fitness() const { return fitness; }
+	string get_word() const { return word; }
+};
+
 const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 //we can add special characters as well above!
 
-vector<string> population;
+vector<Genome> population;
 
 // 2. Initialization of the population
-string generate_StringGenome(string current, int genome_length) {
-	current.resize(target.size());
-	string randomString = current;
-
-	uniform_int_distribution<> chooseletter(0, characters.size());
-	for (int i = 0; i < genome_length; i++) {
-		randomString[i] = characters[chooseletter(gen)];
+Genome generate_StringGenome() {
+	string new_word = "";
+	uniform_int_distribution<> chooseletterindex(0, characters.size());
+	for (int i = 0; i < target.size(); i++) {
+		new_word += characters[chooseletterindex(gen)];
 	}
-	return randomString;
+	return Genome(new_word);
 }
 
-vector<string> generate_string_population(int genome_length, int population_size) {
+vector<Genome> generate_string_population(int population_size) {
 	for (int i = 0; i < population_size; i++) {
-		string genome = generate_StringGenome(current, genome_length);
-		population.push_back(genome);
+		Genome newgenome = generate_StringGenome();
+		population.push_back(newgenome);
 	}
 	return population;
 }
 
 // 3. Fitness Function
-int fitness_function(string genome) {
-	if (genome.size() != target.size()) {
-		return 0; // Invalid genome
-	}
+// --> Already calculated in genome class, Higher match = higher fitness
 
-	int fitness = 0;
-	for (int i = 0; i < genome.size(); i++) {
-		if (genome[i] == target[i]) {
-			fitness++;
-		}
-	}
-	return fitness;
-}
 
 
 // 4. Selection of parents
-vector<string> select_parents(vector<string> population) {
+vector<Genome> select_parents(vector<Genome> population) {
 	int total_fitness = 0;
-	vector<int> fitness_values;
 
-
-	for (const string& genome : population) {
-		int genome_fitness = fitness_function(genome);
-		total_fitness += genome_fitness;
-		fitness_values.push_back(genome_fitness);
+	for (const Genome& genome : population) {
+		total_fitness += genome.get_fitness();
 	}
 
 	if (total_fitness <= 0) return { population[0], population[1] };
@@ -79,13 +96,13 @@ vector<string> select_parents(vector<string> population) {
 	uniform_int_distribution<int> dis(0, total_fitness);
 	int roulette_number = dis(gen);
 
-	string parent1, parent2;
+	Genome parent1, parent2;
 
 	int running_sum = 0;
 
 	// Selection for Parent 1
 	for (int i = 0; i < population.size(); ++i) {
-		running_sum += fitness_values[i]; // Use the stored value
+		running_sum += population[i].get_fitness(); // getting fitness value form each genom in the population
 		if (running_sum >= roulette_number) {
 			parent1 = population[i];
 			break; // <--- CRITICAL: Stop once found!
@@ -96,7 +113,7 @@ vector<string> select_parents(vector<string> population) {
 	roulette_number = dis(gen);
 	running_sum = 0;
 	for (int i = 0; i < population.size(); ++i) {
-		running_sum += fitness_values[i];
+		running_sum += population[i].get_fitness();
 		if (running_sum >= roulette_number) {
 			parent2 = population[i];
 			break; // <--- CRITICAL: Stop once found!
@@ -109,63 +126,63 @@ vector<string> select_parents(vector<string> population) {
 
 // 5. Crossover and Mutation
 
-vector<string> crossover(string parent1, string parent2) {
-	if	(parent1.size() != parent2.size()) {
+vector<Genome> crossover(const Genome& parent1, const Genome& parent2) {
+	if	(parent1.get_word().size() != parent2.get_word().size()) {
 		return {}; // Invalid parents
 	}
-	
-	int crossover_point = rand() % parent1.size();
-	string child1 = parent1.substr(0, crossover_point) + parent2.substr(crossover_point);
-	string child2 = parent2.substr(0, crossover_point) + parent1.substr(crossover_point);
-	return { child1, child2 };
+	if (parent1.get_word().size() != 0 & parent2.get_word().size() != 0) {
+		int crossover_point = rand() % parent1.get_word().size();
+		Genome child1;
+		child1.set_word(parent1.get_word().substr(0, crossover_point) + parent2.get_word().substr(crossover_point));
+		Genome child2;
+		child2.set_word(parent2.get_word().substr(0, crossover_point) + parent1.get_word().substr(crossover_point));
+		return { child1, child2 };
+	}
 }
 
-string mutate(string genome, double mutation_rate) {
-	for (int i = 0; i < genome.size(); i++) {
+Genome mutate(Genome genome, double mutation_rate) {
+	for (int i = 0; i < genome.get_word().size(); i++) {
 		if (((double)rand() / RAND_MAX) < mutation_rate) {
-			genome[i] = characters[rand() % characters.size()];
+			string new_word = genome.get_word();
+			new_word[i] = characters[rand() % characters.size()];
+			genome.set_word(new_word);
 		}
 	}
-	return { genome };
+	return genome;
 }
 
-vector<string> run_evolution(int initial_population_size, int generation_limit, int fitness_limit, int mutation_rate) {
+vector<Genome> run_evolution(int initial_population_size, int generation_limit, int fitness_limit, int mutation_rate) {
 	
-	population = generate_string_population(target.size(), initial_population_size);
+	population = generate_string_population(initial_population_size);
 
 	int timestart = 0, timeend = 0;
 	for (int g = 0; g < generation_limit; ++g) {
 
 		int best_fitness = 0;
-		string best_genome = "";
-		for (const string& s : population) {
-			int f = fitness_function(s);
-			if (f > best_fitness) {
-				best_fitness = f;
-				best_genome = s;
+		string best_genomeWord = "";
+		for (const Genome& genome : population) {
+			int fitness = genome.get_fitness();
+			if (fitness > best_fitness) {
+				best_fitness = fitness;
+				best_genomeWord = genome.get_word();
 			}
 		}
-		if (fitness_function(population[0]) >= fitness_limit ){
-			cout << "Target string evolved: " << population[0] << endl;
-			return population;
-		}
 		
-		cout << "Gen " << g << " Best: " << best_genome << " (" << best_fitness << ")" << endl;
-
+		cout << "Gen " << g << " Best: " << best_genomeWord << " (" << best_fitness << ")" << endl;
 
 		if (best_fitness >= fitness_limit) {
-			cout << "Target reached!" << endl;
+			cout << "Genome string evolved: " << best_genomeWord << endl;
 			return population;
 		}
 
-		vector<string> new_population;
+
+		vector<Genome> new_population;
 		while (new_population.size() < initial_population_size) {
-			vector<string> parents = select_parents(population);
+			vector<Genome> parents = select_parents(population);
+			vector<Genome> children = crossover(parents[0], parents[1]);
 
-			vector<string> children = crossover(parents[0], parents[1]);
-
-			for (string child : children) {
-				string mutated_child = mutate(child, mutation_rate);
+			for (Genome child : children) {
+				Genome mutated_child = mutate(child, mutation_rate);
 				new_population.push_back(mutated_child);
 			}
 		}
