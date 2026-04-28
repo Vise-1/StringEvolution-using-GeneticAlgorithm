@@ -19,6 +19,7 @@ string target = "Trippi";
 string current = "";
 
 const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+//we can add special characters as well above!
 
 vector<string> population;
 
@@ -132,6 +133,7 @@ vector<string> run_evolution(int initial_population_size, int generation_limit, 
 	
 	population = generate_string_population(target.size(), initial_population_size);
 
+	int timestart = 0, timeend = 0;
 	for (int g = 0; g < generation_limit; ++g) {
 
 		int best_fitness = 0;
@@ -147,8 +149,9 @@ vector<string> run_evolution(int initial_population_size, int generation_limit, 
 			cout << "Target string evolved: " << population[0] << endl;
 			return population;
 		}
-
+		
 		cout << "Gen " << g << " Best: " << best_genome << " (" << best_fitness << ")" << endl;
+
 
 		if (best_fitness >= fitness_limit) {
 			cout << "Target reached!" << endl;
@@ -168,6 +171,7 @@ vector<string> run_evolution(int initial_population_size, int generation_limit, 
 		}
 		population = new_population;
 
+
 	}
 	return population;
 }
@@ -181,5 +185,15 @@ int main()
 	
 	cout << "Target String: " << target << endl;
 
+	int starttotal = clock();
 	run_evolution(350, 1000, target.size(), 0.07);
-}
+	int endtotal = clock();
+	double totaltime = double(endtotal - starttotal) / CLOCKS_PER_SEC;
+	cout << "Total Evolution Time: " << totaltime << " seconds." << endl;
+
+	cout << endl;cout << endl;
+	cout << "Made by Sparsh (No AI generated code was used, except for minor bug fixes)" << endl;
+
+	system("pause");
+	return 0;
+} 

@@ -3,3 +3,7 @@ Kie Codes: https://www.youtube.com/watch?v=nhT56blfRpE
 Kie Codes: https://www.youtube.com/watch?v=uQj5UNhCPuo
 
 Computerphile: https://www.youtube.com/watch?v=MacVqujSXWE
+
+https://ultraevolution.org/wiki/string_guessing_tutorial/
+
+https://www.geeksforgeeks.org/dsa/genetic-algorithms/
